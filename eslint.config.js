@@ -14,5 +14,10 @@ export default defineConfig([
 			ecmaVersion: 2020,
 			globals: globals.browser,
 		},
+		rules: {
+			"linebreak-style": ["error", "unix"],
+			"eol-last": ["error", "always"],
+			"no-trailing-spaces": "error",
+		},
 	},
 ])
