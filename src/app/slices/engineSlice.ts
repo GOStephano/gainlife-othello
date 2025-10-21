@@ -1,4 +1,4 @@
-import { redo as engineRedo, executeStep as engineStep, undo as engineUndo, initializeState } from "@lib/othello/core/engine"
+import { redo as engineRedo, playPosition as engineStep, undo as engineUndo, initializeGameState } from "@lib/othello/core/engine"
 import type { GameState, Position } from "@lib/othello/core/types"
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
@@ -9,7 +9,7 @@ export interface GameConfig {
 
 const defaultConfig: GameConfig = { size: 8 }
 
-const initialState: GameState = initializeState(defaultConfig)
+const initialState: GameState = initializeGameState(defaultConfig)
 
 const gameSlice = createSlice({
 	name: "game",
@@ -20,7 +20,7 @@ const gameSlice = createSlice({
 				return { payload: { ...defaultConfig, ...(config ?? {}) } as GameConfig }
 			},
 			reducer(_state, action: PayloadAction<GameConfig>) {
-				return initializeState(action.payload)
+				return initializeGameState(action.payload)
 			},
 		},
 

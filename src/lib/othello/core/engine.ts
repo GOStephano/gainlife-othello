@@ -1,19 +1,13 @@
-import { DIRECTIONS } from "@lib/othello/core/constants"
-import type { Cell, Color, GameConfig, GameState, Position, Snapshot, Vector } from "@lib/othello/core/types"
+import { CELL_STATE, DIRECTIONS, WINNING_COLOR } from "@lib/othello/core/constants"
+import type { Board, Color, GameConfig, GameState, Position, Snapshot, Vector, WinningColor } from "@lib/othello/core/types"
 
-export function initializeState(config: GameConfig): GameState {
-	const size = config.size
-	const board = createEmptyBoard(size)
-	const mid = size / 2
+export function initializeGameState(config: GameConfig): GameState {
+	const boardSize = config.size
+	const board = setDefaultDiscInBoard(createEmptyBoard(boardSize), boardSize)
 
-	board[mid - 1][mid - 1] = "W"
-	board[mid][mid] = "W"
-	board[mid - 1][mid] = "B"
-	board[mid][mid - 1] = "B"
-
-	const turn: Color = "B"
+	const turn: Color = CELL_STATE.BLACK
 	const legalMoves = getLegalMoves(board, turn)
-	const { blackScore, whiteScore } = count(board)
+	const { blackScore, whiteScore } = countScore(board)
 
 	return {
 		board,
@@ -27,16 +21,15 @@ export function initializeState(config: GameConfig): GameState {
 	}
 }
 
-export function executeStep(state: GameState, pos: Position): GameState {
-	console.log({ state })
-	if (state.finished || !canPlay(state.board, pos, state.turn)) return state
+export function playPosition(state: GameState, position: Position): GameState {
+	if (state.finished || !canPlay(state.board, position, state.turn)) return state
 
-	const board = applyMove(state.board, pos, state.turn)
+	const board = applyMove(state.board, position, state.turn)
 	const nextTurnPlayer = nextTurn(board, state.turn)
 	const finished = nextTurnPlayer === null
 	const turn = finished ? state.turn : (nextTurnPlayer as Color)
 	const legalMoves = finished ? [] : getLegalMoves(board, turn)
-	const { blackScore, whiteScore } = count(board)
+	const { blackScore, whiteScore } = countScore(board)
 
 	const winner = finished ? getWinner(whiteScore, blackScore) : undefined
 
@@ -47,13 +40,16 @@ export function executeStep(state: GameState, pos: Position): GameState {
 	return { board, turn, legalMoves, blackScore, whiteScore, finished, winner, previous, next }
 }
 
-export function getFlipped(board: Cell[][], pos: Position, color: Color): Position[] {
-	if (board[pos.row][pos.column] !== ".") return []
+export function getAllFlippedDisc(board: Board, pos: Position, color: Color): Position[] {
+	if (board[pos.row][pos.column] !== CELL_STATE.EMPTY) return []
+
 	const flips: Position[] = []
-	for (const d of DIRECTIONS) {
-		const seg = getFlipsInDirection(board, pos, color, d)
-		if (seg.length) flips.push(...seg)
+
+	for (const direction of DIRECTIONS) {
+		const segment = getFlippedDiscsInDirection(board, pos, color, direction)
+		if (segment.length) flips.push(...segment)
 	}
+
 	return flips
 }
 
@@ -83,15 +79,26 @@ export function redo(state: GameState): GameState {
 
 // private
 
-function createEmptyBoard(size: number): Cell[][] {
-	return Array.from({ length: size }, () => Array.from({ length: size }, () => "."))
+function setDefaultDiscInBoard(board: Board, boardSize: number) {
+	const boardMidPoint = boardSize / 2
+
+	board[boardMidPoint - 1][boardMidPoint - 1] = CELL_STATE.WHITE
+	board[boardMidPoint][boardMidPoint] = CELL_STATE.WHITE
+	board[boardMidPoint - 1][boardMidPoint] = CELL_STATE.BLACK
+	board[boardMidPoint][boardMidPoint - 1] = CELL_STATE.BLACK
+
+	return board
 }
 
-function getLegalMoves(board: Cell[][], color: Color): Position[] {
+function createEmptyBoard(size: number): Board {
+	return Array.from({ length: size }, () => Array.from({ length: size }, () => CELL_STATE.EMPTY))
+}
+
+function getLegalMoves(board: Board, color: Color): Position[] {
 	const moves: Position[] = []
 	for (let row = 0; row < board.length; row++) {
 		for (let column = 0; column < board.length; column++) {
-			if (board[row][column] === "." && canPlay(board, { row, column }, color)) {
+			if (board[row][column] === CELL_STATE.EMPTY && canPlay(board, { row, column }, color)) {
 				moves.push({ row, column })
 			}
 		}
@@ -99,37 +106,38 @@ function getLegalMoves(board: Cell[][], color: Color): Position[] {
 	return moves
 }
 
-function canPlay(board: Cell[][], position: Position, color: Color): boolean {
-	return getFlipped(board, position, color).length > 0
+function canPlay(board: Board, position: Position, color: Color): boolean {
+	return getAllFlippedDisc(board, position, color).length > 0
 }
 
 function getOpponentColor(color: Color): Color {
-	return color === "B" ? "W" : "B"
+	return color === CELL_STATE.BLACK ? CELL_STATE.WHITE : CELL_STATE.BLACK
 }
 
-function getFlipsInDirection(board: Cell[][], playedPosition: Position, color: Color, direction: Vector): Position[] {
+function getFlippedDiscsInDirection(board: Board, playedPosition: Position, color: Color, direction: Vector): Position[] {
 	const flippedCells: Position[] = []
+	const opponent = getOpponentColor(color)
+
 	let row = playedPosition.row + direction.row
 	let column = playedPosition.column + direction.column
 
-	if (!isInBounds(board, row, column) || board[row][column] !== getOpponentColor(color)) return []
-
-	while (isInBounds(board, row, column) && board[row][column] === getOpponentColor(color)) {
+	while (isInBounds(board, row, column) && board[row][column] === opponent) {
 		flippedCells.push({ row, column })
 		row += direction.row
 		column += direction.column
 	}
 
 	if (!isInBounds(board, row, column) || board[row][column] !== color) return []
+
 	return flippedCells
 }
 
-function isInBounds(board: Cell[][], row: number, column: number) {
+function isInBounds(board: Board, row: number, column: number) {
 	return row >= 0 && column >= 0 && row < board.length && column < board.length
 }
 
-function applyMove(board: Cell[][], position: Position, color: Color): Cell[][] {
-	const flips = getFlipped(board, position, color)
+function applyMove(board: Board, position: Position, color: Color): Board {
+	const flips = getAllFlippedDisc(board, position, color)
 	if (flips.length === 0) return board
 
 	const newBoard = cloneBoard(board)
@@ -138,21 +146,21 @@ function applyMove(board: Cell[][], position: Position, color: Color): Cell[][] 
 	return newBoard
 }
 
-function count(board: Cell[][]) {
+function countScore(board: Board) {
 	let blackScore = 0
 	let whiteScore = 0
 
 	for (const row of board) {
 		for (const cell of row) {
-			if (cell === "B") blackScore++
-			else if (cell === "W") whiteScore++
+			if (cell === CELL_STATE.BLACK) blackScore++
+			else if (cell === CELL_STATE.WHITE) whiteScore++
 		}
 	}
 
 	return { blackScore, whiteScore }
 }
 
-function nextTurn(board: Cell[][], currentPlayer: Color) {
+function nextTurn(board: Board, currentPlayer: Color) {
 	const otherPlayer = getOpponentColor(currentPlayer)
 	const otherMoves = getLegalMoves(board, otherPlayer)
 	if (otherMoves.length) return otherPlayer
@@ -160,12 +168,11 @@ function nextTurn(board: Cell[][], currentPlayer: Color) {
 	const curMoves = getLegalMoves(board, currentPlayer)
 	if (curMoves.length) return currentPlayer
 
-	//! game over (no legal moves for either player)
 	return null
 }
 
-function getWinner(whiteScore: number, blackScore: number): Color | "TIE" {
-	return blackScore === whiteScore ? "TIE" : blackScore > whiteScore ? "B" : "W"
+function getWinner(whiteScore: number, blackScore: number): WinningColor {
+	return blackScore === whiteScore ? WINNING_COLOR.TIE : blackScore > whiteScore ? WINNING_COLOR.BLACK : WINNING_COLOR.WHITE
 }
 
 // History helpers
@@ -181,13 +188,13 @@ function restoreFromSnapshot(snapshot: Snapshot, previous: Snapshot[], next: Sna
 	const board = cloneBoard(snapshot.board)
 	const turn = snapshot.turn
 	const legalMoves = getLegalMoves(board, turn)
-	const { blackScore, whiteScore } = count(board)
+	const { blackScore, whiteScore } = countScore(board)
 	const finished = nextTurn(board, turn) === null
 	const winner = finished ? getWinner(whiteScore, blackScore) : undefined
 
 	return { board, turn, legalMoves, blackScore, whiteScore, finished, winner, previous, next }
 }
 
-function cloneBoard(board: Cell[][]): Cell[][] {
+function cloneBoard(board: Board): Board {
 	return board.map((row) => row.slice())
 }

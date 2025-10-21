@@ -1,6 +1,7 @@
 import { makeSelectFlippedSet, makeSelectLegalSet, selectBoard, selectTurn } from "@app/selectors/gameSelectors"
 import { play } from "@app/slices/engineSlice"
 import type { RootState } from "@app/store"
+import { CELL_STATE } from "@lib/othello/core/constants"
 import Square from "@ui/components/Square"
 import React from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -8,20 +9,16 @@ import { useDispatch, useSelector } from "react-redux"
 export default function Board() {
 	const dispatch = useDispatch()
 
-	// base state
 	const board = useSelector(selectBoard)
 	const turn = useSelector(selectTurn)
 	const showHints = useSelector((s: RootState) => s.ui.showHints)
 	const size = board.length
 
-	// local UI-only hover
 	const [hoverPos, setHoverPos] = React.useState<{ row: number; column: number } | null>(null)
 
-	// memoized selector instances
 	const selectLegalSet = React.useMemo(makeSelectLegalSet, [])
 	const selectFlippedSet = React.useMemo(makeSelectFlippedSet, [])
 
-	// derived data (engine-powered but outside the component body logic)
 	const legalSet = useSelector((s: RootState) => selectLegalSet(s))
 	const flippedSet = useSelector((s: RootState) => selectFlippedSet(s, hoverPos))
 
@@ -46,7 +43,7 @@ export default function Board() {
 			{board.map((row, r) =>
 				row.map((cell, c) => {
 					const legal = isLegal(r, c)
-					const empty = cell === "."
+					const empty = cell === CELL_STATE.EMPTY
 					const willFlip = isFlipped(r, c)
 					const isHoverTarget = !!hoverPos && hoverPos.row === r && hoverPos.column === c && legal
 

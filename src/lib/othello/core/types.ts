@@ -1,3 +1,5 @@
+import type { CELL_STATE, WINNING_COLOR } from "@lib/othello/core/constants"
+
 export type Position = {
 	row: number
 	column: number
@@ -8,11 +10,14 @@ export type Vector = {
 	column: number
 }
 
-export type Color = "W" | "B"
-export type Cell = Color | "."
+export type Cell = (typeof CELL_STATE)[keyof typeof CELL_STATE]
+
+export type Color = Exclude<Cell, ".">
+
+export type WinningColor = (typeof WINNING_COLOR)[keyof typeof WINNING_COLOR] | undefined
 
 export type Snapshot = {
-	board: Cell[][]
+	board: Board
 	turn: Color
 }
 
@@ -21,8 +26,10 @@ export interface GameConfig {
 	variant?: "classic" | "corners" | "handicap"
 }
 
+export type Board = Cell[][]
+
 export interface GameState {
-	board: Cell[][]
+	board: Board
 	previous: Snapshot[]
 	next: Snapshot[]
 	turn: Color

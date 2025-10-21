@@ -1,17 +1,17 @@
+import { CELL_STATE } from "@lib/othello/core/constants"
+import type { Cell, Color } from "@lib/othello/core/types"
 import clsx from "clsx"
 import React from "react"
-
-type Turn = "B" | "W"
 
 export interface SquareProps {
 	r: number
 	c: number
-	cell: "." | "B" | "W"
+	cell: Cell
 	legal: boolean
 	empty: boolean
 	willFlip: boolean
 	isHoverTarget: boolean
-	turn: Turn
+	turn: Color
 	showHints: boolean
 	onClick: (r: number, c: number) => void
 	onHoverIn: (r: number, c: number, legal: boolean) => void
@@ -36,14 +36,14 @@ function SquareBase({ r, c, cell, legal, empty, willFlip, isHoverTarget, turn, s
 				cursor: "pointer",
 			}}
 		>
-			{cell !== "." && (
+			{cell !== CELL_STATE.EMPTY && (
 				<div
 					className="disc"
 					style={{
 						width: 34,
 						height: 34,
 						borderRadius: "50%",
-						background: cell === "B" ? "#111" : "#f5f5f5",
+						background: cell === CELL_STATE.BLACK ? "#111" : "#f5f5f5",
 						margin: "auto",
 					}}
 				/>
@@ -56,7 +56,7 @@ function SquareBase({ r, c, cell, legal, empty, willFlip, isHoverTarget, turn, s
 						width: 34,
 						height: 34,
 						borderRadius: "50%",
-						background: turn === "B" ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.6)",
+						background: turn === CELL_STATE.BLACK ? "rgba(0,0,0,0.35)" : "rgba(255,255,255,0.6)",
 						margin: "auto",
 						position: "absolute",
 						top: "50%",
@@ -73,7 +73,7 @@ function SquareBase({ r, c, cell, legal, empty, willFlip, isHoverTarget, turn, s
 						width: 34,
 						height: 34,
 						borderRadius: "50%",
-						background: turn === "B" ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.5)",
+						background: turn === CELL_STATE.BLACK ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.5)",
 						position: "absolute",
 						top: "50%",
 						left: "50%",
