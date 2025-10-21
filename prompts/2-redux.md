@@ -7,6 +7,8 @@ Include simple AI settings (enabled, color, delay, strategy, profile)
 Include reducers for playing moves, undo/redo, toggling hints, and AI configuration
 Include the redux store configuration with its exports
 
+> -------------RESPONSE-------------<
+
 ```ts
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 import { count, getLegalMoves, initialState as init, nextTurn, step } from "../../lib/othello/engine"

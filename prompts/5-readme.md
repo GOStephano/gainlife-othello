@@ -1,10 +1,135 @@
+Here is my current readme
+Format it correctly with sections
+Do not add anything to it, do no drastically change the meaning
+
 # Othello (React + TypeScript)
+
+A client-side Othello game built as a Single Page Application using React, TypeScript, and Redux Toolkit — designed for clarity, extensibility, and maintainability.
+
+```cmd
+🚀 Quick Start
+npm install
+npm start
+```
+
+Runs the Vite dev server at http://localhost:5173
+
+# Tech Stack
+
+Vite – fast bundler
+React + TypeScript – type-safe
+Redux Toolkit – state management
+ESLint + Prettier – consistent, Unix-compliant formatting
+
+# Thought process
+
+1. chore: initialize Vite React TypeScript project
+
+Started from a clean Vite template with React + TS.
+Goal: keep the setup minimal and fully client-side (CSR only).
+Configured initial project structure to separate app, lib, and ui concerns.
+
+2. chore: add linebreak rules
+
+Early step to ensure Unix compliance — enforced LF endings, trailing newline, and clean diffs via ESLint
+
+3. feat: added game engine
+
+Implemented a pure TypeScript Othello engine inside lib/othello/core/.
+The engine includes:
+
+Board initialization
+Move validation (including directional flipping)
+Turn logic and scoring
+Terminal detection
+
+Thought process:
+
+Keep engine pure and framework-agnostic so it can be reused in tests, AI, or even another UI framework.
+Put all rules in a single place to avoid duplicated logic in Redux or UI layers.
+
+4. refactor: clean up engines + extract types
+
+After initial feature growth, extracted all type definitions into a dedicated types.ts.
+This improved clarity and made the engine easier to extend (e.g., future variants, board size options).
+
+Anticipated issue: coupling between engine and Redux types.
+Solution: define GameState, Move, and Player at the core layer, then reference them everywhere else.
+
+5. feat: added redux store + engine slice
+
+Introduced Redux Toolkit for predictable state management.
+The engineSlice manages:
+
+Current game state
+Integration with engine functions (init, step)
+Undo/redo via snapshots
+
+Thought process:
+
+Treat the Redux slice like a “controller” between UI and pure game logic.
+Keep the reducer small and declarative by delegating heavy logic to engine helpers.
+History handling was designed with future AI replays and game export in mind.
+
+6. feat(ui): board + controls + score panel + uiSlice
+
+Built the initial UI layer:
+Board – renders the grid and interactive squares
+ScorePanel – shows player scores and current turn
+Controls – reset/undo/redo buttons
+uiSlice – manages non-game UI state (visibility, hints, etc.)
+
+Design choices:
+
+Keep components dumb and driven by Redux selectors.
+Avoid state duplication — the single source of truth is always the store.
+Used inline styles for MVP speed, but structure allows later theming or CSS modules.
+
+7. feat(ui): added ui state selectors
+
+Introduced selectors under ui/selectors/ to separate UI logic from components.
+Selectors keep components minimal and make it easy to add derived values (like current player name or hint markers).
+
+Anticipated issue: prop drilling and over-re-renders.
+Solution: selectors + memoization keep updates efficient and composable.
+
+8. feat(engine): game history with snapshots
+
+Added a snapshot-based undo/redo system:
+past, present, future stacks
+Each move pushes a snapshot; undo/redo simply swaps states
+
+Thought process:
+
+Simple, predictable approach for MVP.
+Chose full-state snapshots for reliability over performance; can later optimize with diffs or move lists.
+This structure will also support “replay mode” or move analysis features later.
+
+9. chore: use absolute paths
+
+Finalized developer experience by enabling absolute imports with @app, @ui, @lib, @assets.
+This improves readability and resilience during refactors.
+
+# Possible evolutions:
+
+Add a “move list” view for users.
+Add save/load support via localStorage or replay files under lib/othello/infra/.
+Store every ended game in DB
+Add an AI player
+Upload AI configuration
+Replays/Game analysis for AI training
+Multiplayer
+Use redis for cache
+
+---
+
+# 🕹️ Othello (React + TypeScript)
 
 A client-side Othello game built as a Single Page Application using **React**, **TypeScript**, and **Redux Toolkit** — designed for clarity, extensibility, and maintainability.
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
 npm install
@@ -15,7 +140,7 @@ Runs the Vite dev server at [http://localhost:5173](http://localhost:5173/)
 
 ---
 
-## Tech Stack
+## 🧱 Tech Stack
 
 - **Vite** – fast bundler for modern React apps
 - **React + TypeScript** – type-safe, declarative UI
@@ -25,14 +150,11 @@ Runs the Vite dev server at [http://localhost:5173](http://localhost:5173/)
 
 ---
 
-## Architecture Overview
+## ⚙️ Architecture Overview
 
 ```
 src/
-  app/
-    selector/
-    slices/
-    store
+  app/         # Redux slices, store, selectors
   lib/
     othello/
       core/    # Pure TS game logic (framework-agnostic)

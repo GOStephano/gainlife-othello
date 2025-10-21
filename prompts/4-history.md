@@ -2,6 +2,8 @@ Give me a couple of suggestion on how I could handle game history
 So the player can eventually undo and redo his moves
 No code or small code snippets
 
+> -------------RESPONSE-------------<
+
 # Snapshot stack (Past/Present/Future)
 
 - **How it works:** On every valid move, push `present` to `past`, set `present = next`, clear `future`. Undo pops from `past` to `present` and pushes old `present` to `future`; redo pulls from `future`.

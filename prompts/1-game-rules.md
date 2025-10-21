@@ -5,6 +5,8 @@ type Position = { row: number; column: number; }; type Color = "W" | "B"; type C
 interface GameConfig { size: number; showHints: boolean; variant?: "classic" | "corners" | "handicap"; }
 interface GameState { board: Cell[][]; turn: Color; legalMoves: Position[]; blackScore: number; whiteScore: number; finished: boolean; winner?: Color | "TIE"; }
 
+> -------------RESPONSE-------------<
+
 types.ts
 
 ```ts

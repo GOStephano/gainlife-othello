@@ -3,6 +3,8 @@ A Board which will contain a map of Squares Squares which will be blank or color
 A ScorePanel and Control which will be able to start a new game, select the map size
 These components will be contained in a page
 
+> -------------RESPONSE-------------<
+
 ```ts
 import React from "react"
 
