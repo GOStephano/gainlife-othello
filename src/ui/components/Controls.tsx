@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux"
-import { newGame } from "../../app/engineSlice"
+import { newGame, redo, undo } from "../../app/engineSlice"
 import { toggleShowHints } from "../../app/uiSlice"
 
 export default function Controls() {
@@ -11,7 +11,8 @@ export default function Controls() {
 				<button onClick={() => d(newGame({ size: 6 }))}>New 6x6</button>
 				<button onClick={() => d(newGame({ size: 8 }))}>New 8x8</button>
 				<button onClick={() => d(newGame({ size: 10 }))}>New 10x10</button>
-
+				<button onClick={() => d(undo())}>Undo</button>
+				<button onClick={() => d(redo())}>Redo</button>
 				<button onClick={() => d(toggleShowHints())}>Toggle Hints</button>
 			</div>
 

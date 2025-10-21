@@ -1,5 +1,5 @@
 import { DIRECTIONS } from "./constants"
-import type { Cell, Color, GameConfig, GameState, Position, Vector } from "./types"
+import type { Cell, Color, GameConfig, GameState, Position, Snapshot, Vector } from "./types"
 
 export function initializeState(config: GameConfig): GameState {
 	const size = config.size
@@ -21,6 +21,8 @@ export function initializeState(config: GameConfig): GameState {
 		legalMoves,
 		blackScore,
 		whiteScore,
+		next: [],
+		previous: [],
 		finished: false,
 	}
 }
@@ -38,7 +40,11 @@ export function executeStep(state: GameState, pos: Position): GameState {
 
 	const winner = finished ? getWinner(whiteScore, blackScore) : undefined
 
-	return { board, turn, legalMoves, blackScore, whiteScore, finished, winner }
+	const prevSnapshot = makeSnapshot(state)
+	const previous = [...state.previous, prevSnapshot]
+	const next: Snapshot[] = []
+
+	return { board, turn, legalMoves, blackScore, whiteScore, finished, winner, previous, next }
 }
 
 export function getFlipped(board: Cell[][], pos: Position, color: Color): Position[] {
@@ -49,6 +55,30 @@ export function getFlipped(board: Cell[][], pos: Position, color: Color): Positi
 		if (seg.length) flips.push(...seg)
 	}
 	return flips
+}
+
+export function undo(state: GameState): GameState {
+	if (state.previous.length === 0) return state
+
+	const target = state.previous[state.previous.length - 1]
+
+	const redoSnapshot = makeSnapshot(state)
+	const previous = state.previous.slice(0, -1)
+	const next = [...state.next, redoSnapshot]
+
+	return restoreFromSnapshot(target, previous, next)
+}
+
+export function redo(state: GameState): GameState {
+	if (state.next.length === 0) return state
+
+	const target = state.next[state.next.length - 1]
+
+	const undoSnapshot = makeSnapshot(state)
+	const previous = [...state.previous, undoSnapshot]
+	const next = state.next.slice(0, -1)
+
+	return restoreFromSnapshot(target, previous, next)
 }
 
 // private
@@ -102,7 +132,7 @@ function applyMove(board: Cell[][], position: Position, color: Color): Cell[][] 
 	const flips = getFlipped(board, position, color)
 	if (flips.length === 0) return board
 
-	const newBoard = board.map((row) => row.slice())
+	const newBoard = cloneBoard(board)
 	for (const cell of flips) newBoard[cell.row][cell.column] = color
 	newBoard[position.row][position.column] = color
 	return newBoard
@@ -136,4 +166,28 @@ function nextTurn(board: Cell[][], currentPlayer: Color) {
 
 function getWinner(whiteScore: number, blackScore: number): Color | "TIE" {
 	return blackScore === whiteScore ? "TIE" : blackScore > whiteScore ? "B" : "W"
+}
+
+// History helpers
+
+function makeSnapshot(state: GameState): Snapshot {
+	return {
+		board: cloneBoard(state.board),
+		turn: state.turn,
+	}
+}
+
+function restoreFromSnapshot(snapshot: Snapshot, previous: Snapshot[], next: Snapshot[]): GameState {
+	const board = cloneBoard(snapshot.board)
+	const turn = snapshot.turn
+	const legalMoves = getLegalMoves(board, turn)
+	const { blackScore, whiteScore } = count(board)
+	const finished = nextTurn(board, turn) === null
+	const winner = finished ? getWinner(whiteScore, blackScore) : undefined
+
+	return { board, turn, legalMoves, blackScore, whiteScore, finished, winner, previous, next }
+}
+
+function cloneBoard(board: Cell[][]): Cell[][] {
+	return board.map((row) => row.slice())
 }
