@@ -38,4 +38,11 @@ export interface GameState {
 	whiteScore: number
 	finished: boolean
 	winner?: Color | "TIE"
+
+	id?: string
+	revision?: number
 }
+
+export type NetAction =
+	| { type: "play"; pos: Position; actor?: Color; revision?: number }
+	| { type: "pass"; actor?: Color; revision?: number } // optional future action

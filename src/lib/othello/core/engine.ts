@@ -1,5 +1,5 @@
 import { CELL_STATE, DIRECTIONS, WINNING_COLOR } from "@lib/othello/core/constants"
-import type { Board, Color, GameConfig, GameState, Position, Snapshot, Vector, WinningColor } from "@lib/othello/core/types"
+import type { Board, Color, GameConfig, GameState, NetAction, Position, Snapshot, Vector, WinningColor } from "@lib/othello/core/types"
 
 export function initializeGameState(config: GameConfig): GameState {
 	const boardSize = config.size
@@ -18,6 +18,24 @@ export function initializeGameState(config: GameConfig): GameState {
 		next: [],
 		previous: [],
 		finished: false,
+	}
+}
+
+export function step(state: GameState, action: NetAction): GameState {
+	if (action.revision !== state.revision) {
+		// The player's state was outdated — reject action
+	}
+
+	switch (action.type) {
+		case "play": {
+			const next = playPosition(state, action.pos)
+			return { ...next, revision: (state.revision ?? 0) + 1 }
+		}
+		case "pass": {
+			return state
+		}
+		default:
+			return state
 	}
 }
 

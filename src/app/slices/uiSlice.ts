@@ -22,7 +22,7 @@ export interface UiState {
 }
 
 const initialState: UiState = {
-	showHints: true, // purely visual; engine doesn’t care
+	showHints: true,
 	animations: true,
 	sound: true,
 	theme: "system",
@@ -36,7 +36,6 @@ const uiSlice = createSlice({
 	name: "ui",
 	initialState,
 	reducers: {
-		// Preferences
 		toggleShowHints(s) {
 			s.showHints = !s.showHints
 		},
@@ -81,7 +80,6 @@ const uiSlice = createSlice({
 			s.confirmResignOpen = false
 		},
 
-		// Optional: reset UI state when starting a new game
 		resetUiState() {
 			return initialState
 		},
@@ -106,7 +104,6 @@ export const {
 
 export default uiSlice.reducer
 
-// Selectors (kept narrow so components don’t over-render)
 export const selectShowHints = (s: { ui: UiState }) => s.ui.showHints
 export const selectAnimations = (s: { ui: UiState }) => s.ui.animations
 export const selectSound = (s: { ui: UiState }) => s.ui.sound
