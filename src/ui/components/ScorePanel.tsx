@@ -1,5 +1,5 @@
+import type { RootState } from "@app/store"
 import { useSelector } from "react-redux"
-import type { RootState } from "../../app/store"
 
 export default function ScorePanel() {
 	const { blackScore, whiteScore, turn, finished, winner } = useSelector((s: RootState) => s.game)

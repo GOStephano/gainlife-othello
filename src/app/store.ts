@@ -1,6 +1,6 @@
+import game from "@app/engineSlice"
+import ui from "@app/uiSlice"
 import { configureStore } from "@reduxjs/toolkit"
-import game from "./engineSlice"
-import ui from "./uiSlice"
 
 export const store = configureStore({ reducer: { game, ui } })
 export type RootState = ReturnType<typeof store.getState>

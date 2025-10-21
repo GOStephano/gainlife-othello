@@ -1,9 +1,9 @@
+import { play } from "@app/engineSlice"
+import { makeSelectFlippedSet, makeSelectLegalSet, selectBoard, selectTurn } from "@app/selectors/gameSelectors"
+import type { RootState } from "@app/store"
+import Square from "@ui/components/Square"
 import React from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { play } from "../../app/engineSlice"
-import type { RootState } from "../../app/store"
-import { makeSelectFlippedSet, makeSelectLegalSet, selectBoard, selectTurn } from "../selectors/gameSelectors"
-import Square from "./Square"
 
 export default function Board() {
 	const dispatch = useDispatch()

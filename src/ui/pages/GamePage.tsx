@@ -1,6 +1,6 @@
-import Board from "../components/Board"
-import Controls from "../components/Controls"
-import ScorePanel from "../components/ScorePanel"
+import Board from "@ui/components/Board"
+import Controls from "@ui/components/Controls"
+import ScorePanel from "@ui/components/ScorePanel"
 
 export default function GamePage() {
 	return (

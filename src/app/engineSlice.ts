@@ -1,6 +1,6 @@
+import { redo as engineRedo, executeStep as engineStep, undo as engineUndo, initializeState } from "@lib/othello/core/engine"
+import type { GameState, Position } from "@lib/othello/core/types"
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
-import { redo as engineRedo, executeStep as engineStep, undo as engineUndo, initializeState } from "../lib/othello/core/engine"
-import type { GameState, Position } from "../lib/othello/core/types"
 
 export interface GameConfig {
 	size: number

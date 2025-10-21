@@ -1,7 +1,7 @@
+import type { RootState } from "@app/store"
+import { getFlipped as engineGetFlipped } from "@lib/othello/core/engine"
+import type { Position } from "@lib/othello/core/types"
 import { createSelector } from "@reduxjs/toolkit"
-import type { RootState } from "../../app/store"
-import { getFlipped as engineGetFlipped } from "../../lib/othello/core/engine"
-import type { Position } from "../../lib/othello/core/types"
 
 export const selectBoard = (s: RootState) => s.game.board
 export const selectLegalMoves = (s: RootState) => s.game.legalMoves

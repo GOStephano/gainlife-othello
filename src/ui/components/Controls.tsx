@@ -1,6 +1,6 @@
+import { newGame, redo, undo } from "@app/engineSlice"
+import { toggleShowHints } from "@app/uiSlice"
 import { useDispatch } from "react-redux"
-import { newGame, redo, undo } from "../../app/engineSlice"
-import { toggleShowHints } from "../../app/uiSlice"
 
 export default function Controls() {
 	const d = useDispatch()

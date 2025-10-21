@@ -1,4 +1,4 @@
-import type { Position } from "./types"
+import type { Position } from "@lib/othello/core/types"
 
 export const DIRECTIONS: Position[] = [
 	{ row: -1, column: -1 },

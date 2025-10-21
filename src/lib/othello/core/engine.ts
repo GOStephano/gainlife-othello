@@ -1,5 +1,5 @@
-import { DIRECTIONS } from "./constants"
-import type { Cell, Color, GameConfig, GameState, Position, Snapshot, Vector } from "./types"
+import { DIRECTIONS } from "@lib/othello/core/constants"
+import type { Cell, Color, GameConfig, GameState, Position, Snapshot, Vector } from "@lib/othello/core/types"
 
 export function initializeState(config: GameConfig): GameState {
 	const size = config.size
