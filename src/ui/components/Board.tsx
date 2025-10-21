@@ -1,5 +1,5 @@
-import { play } from "@app/engineSlice"
 import { makeSelectFlippedSet, makeSelectLegalSet, selectBoard, selectTurn } from "@app/selectors/gameSelectors"
+import { play } from "@app/slices/engineSlice"
 import type { RootState } from "@app/store"
 import Square from "@ui/components/Square"
 import React from "react"

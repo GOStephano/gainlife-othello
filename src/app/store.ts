@@ -1,5 +1,5 @@
-import game from "@app/engineSlice"
-import ui from "@app/uiSlice"
+import game from "@app/slices/engineSlice"
+import ui from "@app/slices/uiSlice"
 import { configureStore } from "@reduxjs/toolkit"
 
 export const store = configureStore({ reducer: { game, ui } })
